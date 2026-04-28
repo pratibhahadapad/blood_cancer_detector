@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blood Cancer Detection</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+        }
+
+        header {
+            background: #0d6efd;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            width: 420px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 6px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #084298;
+        }
+
+        hr {
+            margin: 20px 0;
+        }
+
+        .result-card {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .low {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .high {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .bar-container {
+            width: 100%;
+            background: #ddd;
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+
+        .bar {
+            height: 20px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .green {
+            background: green;
+        }
+
+        .red {
+            background: red;
+        }
+
+        .extracted-box {
+            background: #eef5ff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    🏥 AI Blood Cancer Detection System
+</header>
+
+<div class="container">
+    <div class="card">
+
+        <!-- MANUAL INPUT -->
+        <h2>Manual Entry</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label>Age</label>
+            <input type="number" name="age" required>
+
+            <label>Hemoglobin</label>
+            <input type="number" step="0.1" name="hemoglobin" required>
+
+            <label>WBC</label>
+            <input type="number" name="wbc" required>
+
+            <label>Platelets</label>
+            <input type="number" name="platelets" required>
+
+            <button type="submit">Predict Manually</button>
+        </form>
+
+        <hr>
+
+        <!-- FILE UPLOAD -->
+        <h2>Upload Report</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <input type="file" name="report" required>
+
+            <button type="submit">Analyze Report</button>
+        </form>
+
+        <!-- EXTRACTED VALUES -->
+        {% if extracted %}
+        <div class="extracted-box">
+            <h3>📊 Extracted Data</h3>
+            <p><b>Hemoglobin:</b> {{ extracted.hb }}</p>
+            <p><b>WBC:</b> {{ extracted.wbc }}</p>
+            <p><b>Platelets:</b> {{ extracted.platelets }}</p>
+        </div>
+        {% endif %}
+
+        <!-- RESULT -->
+        {% if result %}
+        <div class="result-card {% if result == 'Low' %}low{% else %}high{% endif %}">
+
+            <h3>Prediction: {{ result }} Risk</h3>
+            <p>Confidence: {{ confidence }}%</p>
+
+            <div class="bar-container">
+                <div class="bar {% if result == 'Low' %}green{% else %}red{% endif %}"
+                     style="width: {{ confidence }}%;">
+                    {{ confidence }}%
+                </div>
+            </div>
+
+            {% if result == "Low" %}
+                <p>✅ Patient condition appears normal</p>
+            {% else %}
+                <p>⚠️ Further medical diagnosis recommended</p>
+            {% endif %}
+
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+</body>
+</html>
